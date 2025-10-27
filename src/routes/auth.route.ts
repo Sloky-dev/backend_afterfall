@@ -42,4 +42,34 @@ router.post("/register", async (req, res, next) => {
   }
 });
 
+router.post("/login", async (req, res, next) => {
+  try {
+    const { email, password } = req.body as Partial<{ email: string; password: string }>;
+
+    if (!email || typeof email !== "string" || !password || typeof password !== "string") {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const passwordMatches = await bcrypt.compare(password, user.password);
+    if (!passwordMatches) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    return res.json({
+      id: user.id,
+      email: user.email,
+      createdAt: user.createdAt,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

@@ -33,6 +33,7 @@ PORT=4000
 ## Routes disponibles
 
 - `POST /api/auth/register` : cree un utilisateur avec `email` et `password` (mot de passe >= 6 caracteres).
+- `POST /api/auth/login` : verifie les identifiants et retourne l'utilisateur.
 - `GET /api/health` : verifie la connexion a PostgreSQL (`SELECT 1`).
 
 ## Etapes suivantes
