@@ -19,6 +19,7 @@ model User {
   password  String
   pseudonym String   @unique
   level     Int      @default(1)
+  pseudonymUpdatedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -57,6 +57,7 @@ router.post("/register", async (req, res, next) => {
         id: true,
         email: true,
         pseudonym: true,
+        pseudonymUpdatedAt: true,
         level: true,
         createdAt: true,
       },
@@ -92,6 +93,7 @@ router.post("/login", async (req, res, next) => {
       id: user.id,
       email: user.email,
       pseudonym: user.pseudonym,
+      pseudonymUpdatedAt: user.pseudonymUpdatedAt,
       level: user.level,
       createdAt: user.createdAt,
     });
