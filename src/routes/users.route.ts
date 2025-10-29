@@ -42,7 +42,7 @@ router.patch("/:id", async (req, res, next) => {
     const updated = await prisma.user.update({
       where: { id },
       data: { email: normalizedEmail },
-      select: { id: true, email: true, createdAt: true },
+      select: { id: true, email: true, pseudonym: true, level: true, createdAt: true },
     });
 
     return res.json(updated);
