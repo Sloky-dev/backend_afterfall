@@ -3,7 +3,7 @@ import { polygonContains } from 'd3-polygon';
 
 export type ResourceType =
   | 'money'
-  | 'conserve'
+  | 'food'
   | 'water'
   | 'metal'
   | 'wood'
@@ -29,7 +29,7 @@ export interface GameMap {
   tiles: ServerTile[];
 }
 
-const RESOURCE_TYPES: ResourceType[] = ['conserve','water','metal','wood','oil','electricity','nuclear','money'];
+const RESOURCE_TYPES: ResourceType[] = ['food','water','metal','wood','oil','electricity','nuclear','money'];
 
 function generateSeaPolygon(width: number, height: number): [number, number][] {
   const centerX = width / 2;

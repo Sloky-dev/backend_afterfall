@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateGameMap = generateGameMap;
 const d3_delaunay_1 = require("d3-delaunay");
 const d3_polygon_1 = require("d3-polygon");
-const RESOURCE_TYPES = ['conserve', 'water', 'metal', 'wood', 'oil', 'electricity', 'nuclear', 'money'];
+const RESOURCE_TYPES = ['food', 'water', 'metal', 'wood', 'oil', 'electricity', 'nuclear', 'money'];
 function generateSeaPolygon(width, height) {
     const centerX = width / 2;
     const centerY = height / 2;
