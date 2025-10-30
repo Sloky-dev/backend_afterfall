@@ -8,6 +8,20 @@ const generateDigits = () => Math.floor(Math.random() * 10000)
   .toString()
   .padStart(4, "0");
 
+const SUPPORTED_LOCALES = ["fr", "en"] as const;
+type SupportedLocale = typeof SUPPORTED_LOCALES[number];
+
+const sanitizeLocale = (raw?: unknown): SupportedLocale => {
+  if (!raw || typeof raw !== "string") {
+    return "fr";
+  }
+
+  const normalized = raw.trim().toLowerCase();
+  return (SUPPORTED_LOCALES as readonly string[]).includes(normalized)
+    ? normalized as SupportedLocale
+    : "fr";
+};
+
 const generateUniquePseudonym = async (): Promise<string> => {
   const maxAttempts = 50;
 
@@ -28,7 +42,7 @@ const generateUniquePseudonym = async (): Promise<string> => {
 
 router.post("/register", async (req, res, next) => {
   try {
-    const { email, password } = req.body as Partial<{ email: string; password: string; }>;
+    const { email, password, locale } = req.body as Partial<{ email: string; password: string; locale: string }>;
 
     if (!email || typeof email !== "string") {
       return res.status(400).json({ message: "Email is required" });
@@ -47,11 +61,13 @@ router.post("/register", async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const pseudonym = await generateUniquePseudonym();
+    const userLocale = sanitizeLocale(locale);
     const user = await prisma.user.create({
       data: {
         email: normalizedEmail,
         password: hashedPassword,
         pseudonym,
+        locale: userLocale,
       },
       select: {
         id: true,
@@ -60,6 +76,7 @@ router.post("/register", async (req, res, next) => {
         pseudonymUpdatedAt: true,
         level: true,
         createdAt: true,
+        locale: true,
       },
     });
 
@@ -96,6 +113,7 @@ router.post("/login", async (req, res, next) => {
       pseudonymUpdatedAt: user.pseudonymUpdatedAt,
       level: user.level,
       createdAt: user.createdAt,
+      locale: user.locale,
     });
   } catch (error) {
     next(error);

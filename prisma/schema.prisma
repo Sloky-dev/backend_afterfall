@@ -22,4 +22,6 @@ model User {
   pseudonymUpdatedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  locale    String   @default("fr")
 }
+

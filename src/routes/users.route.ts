@@ -4,6 +4,19 @@ import { prisma } from "../lib/prisma";
 
 const router = Router();
 const NINETY_DAYS_IN_MS = 90 * 24 * 60 * 60 * 1000;
+const SUPPORTED_LOCALES = ["fr", "en"] as const;
+type SupportedLocale = typeof SUPPORTED_LOCALES[number];
+
+const sanitizeLocale = (raw?: unknown): SupportedLocale | null => {
+  if (typeof raw !== "string") {
+    return null;
+  }
+
+  const normalized = raw.trim().toLowerCase();
+  return (SUPPORTED_LOCALES as readonly string[]).includes(normalized)
+    ? normalized as SupportedLocale
+    : null;
+};
 
 router.patch("/:id", async (req, res, next) => {
   try {
@@ -50,6 +63,7 @@ router.patch("/:id", async (req, res, next) => {
         pseudonymUpdatedAt: true,
         level: true,
         createdAt: true,
+        locale: true,
       },
     });
 
@@ -139,6 +153,7 @@ router.patch("/:id/pseudonym", async (req, res, next) => {
         pseudonymUpdatedAt: user.pseudonymUpdatedAt,
         level: user.level,
         createdAt: user.createdAt,
+        locale: user.locale,
       });
     }
 
@@ -176,11 +191,50 @@ router.patch("/:id/pseudonym", async (req, res, next) => {
         pseudonymUpdatedAt: true,
         level: true,
         createdAt: true,
+        locale: true,
       },
     });
 
     return res.json(updated);
   } catch (error) {
+    next(error);
+  }
+});
+
+router.patch("/:id/locale", async (req, res, next) => {
+  try {
+    const { id } = req.params as { id?: string };
+    const { locale } = req.body as Partial<{ locale: string }>;
+
+    if (!id) {
+      return res.status(400).json({ message: "User id is required" });
+    }
+
+    const sanitized = sanitizeLocale(locale);
+    if (!sanitized) {
+      return res.status(400).json({ message: "Locale non prise en charge." });
+    }
+
+    const user = await prisma.user.update({
+      where: { id },
+      data: { locale: sanitized },
+      select: {
+        id: true,
+        email: true,
+        pseudonym: true,
+        pseudonymUpdatedAt: true,
+        level: true,
+        createdAt: true,
+        locale: true,
+      },
+    });
+
+    return res.json(user);
+  } catch (error) {
+    if (error instanceof Error && "code" in error && (error as any).code === "P2025") {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     next(error);
   }
 });
