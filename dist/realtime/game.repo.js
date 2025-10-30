@@ -8,9 +8,12 @@ exports.markDisconnected = markDisconnected;
 exports.getClientState = getClientState;
 const prisma_1 = require("../lib/prisma");
 const crypto_1 = require("crypto");
+const map_generator_1 = require("./map.generator");
 async function createGame(createdBy) {
+    const map = (0, map_generator_1.generateGameMap)();
     const game = await prisma_1.prisma.gameSession.create({
-        data: { createdBy },
+        // Cast to any to avoid prisma type mismatch before generate
+        data: { createdBy, map },
         select: { id: true, createdAt: true },
     });
     return game;
@@ -62,7 +65,8 @@ async function markDisconnected(gameId, playerId) {
 async function getClientState(gameId) {
     const game = await prisma_1.prisma.gameSession.findUnique({
         where: { id: gameId },
-        select: { id: true, players: { select: { id: true, pseudonym: true, connected: true } } },
+        // Cast select as any to read map without regenerated client types
+        select: { id: true, map: true, players: { select: { id: true, pseudonym: true, connected: true } } },
     });
-    return game ? { id: game.id, players: game.players } : null;
+    return game ? { id: game.id, players: game.players, map: game.map } : null;
 }

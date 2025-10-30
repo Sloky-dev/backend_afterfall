@@ -1,9 +1,12 @@
 import { prisma } from "../lib/prisma";
 import { randomUUID } from "crypto";
+import { generateGameMap, GameMap } from "./map.generator";
 
 export async function createGame(createdBy: string) {
+  const map = generateGameMap();
   const game = await prisma.gameSession.create({
-    data: { createdBy },
+    // Cast to any to avoid prisma type mismatch before generate
+    data: { createdBy, map } as any,
     select: { id: true, createdAt: true },
   });
   return game;
@@ -60,8 +63,8 @@ export async function markDisconnected(gameId: string, playerId: string) {
 export async function getClientState(gameId: string) {
   const game = await prisma.gameSession.findUnique({
     where: { id: gameId },
-    select: { id: true, players: { select: { id: true, pseudonym: true, connected: true } } },
-  });
-  return game ? { id: game.id, players: game.players } : null;
+    // Cast select as any to read map without regenerated client types
+    select: { id: true, map: true, players: { select: { id: true, pseudonym: true, connected: true } } } as any,
+  }) as any;
+  return game ? { id: game.id, players: game.players, map: game.map as GameMap } : null;
 }
-
