@@ -64,7 +64,8 @@ router.patch("/:id", async (req, res, next) => {
         level: true,
         createdAt: true,
         locale: true,
-      },
+        role: true,
+      } as any,
     });
 
     return res.json(updated);
@@ -154,6 +155,7 @@ router.patch("/:id/pseudonym", async (req, res, next) => {
         level: user.level,
         createdAt: user.createdAt,
         locale: user.locale,
+        role: (user as any).role,
       });
     }
 
@@ -192,7 +194,8 @@ router.patch("/:id/pseudonym", async (req, res, next) => {
         level: true,
         createdAt: true,
         locale: true,
-      },
+        role: true,
+      } as any,
     });
 
     return res.json(updated);
@@ -226,7 +229,8 @@ router.patch("/:id/locale", async (req, res, next) => {
         level: true,
         createdAt: true,
         locale: true,
-      },
+        role: true,
+      } as any,
     });
 
     return res.json(user);

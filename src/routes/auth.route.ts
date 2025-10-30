@@ -77,7 +77,8 @@ router.post("/register", async (req, res, next) => {
         level: true,
         createdAt: true,
         locale: true,
-      },
+        role: true,
+      } as any,
     });
 
     return res.status(201).json(user);
@@ -114,6 +115,7 @@ router.post("/login", async (req, res, next) => {
       level: user.level,
       createdAt: user.createdAt,
       locale: user.locale,
+      role: (user as any).role,
     });
   } catch (error) {
     next(error);

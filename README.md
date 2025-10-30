@@ -39,7 +39,9 @@ PORT=4000
 ## Etapes suivantes
 
 1. Executer `npm run prisma:pull` pour recuperer la structure actuelle de la base `afterfall`.
-2. Lancer `npx prisma migrate dev --name create-user` (apres avoir arrete le serveur et configure `.env`) afin de creer la table `User`, puis `npm run prisma:generate`.
+2. Apres ajout de nouvelles colonnes (ex: `role` sur `User`), lancer une migration Prisma:
+   - `npx prisma migrate dev --name add-role-to-user`
+   - puis `npm run prisma:generate` pour mettre a jour le client Prisma.
 3. Coder les controlleurs et routes Express correspondant aux tables generees par Prisma.
 4. Ajouter des tests ou de l'observabilite selon les besoins.
 
