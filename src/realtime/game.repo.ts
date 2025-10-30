@@ -17,10 +17,11 @@ export async function listGames() {
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
+      createdAt: true,
       players: { select: { id: true, pseudonym: true, connected: true } },
     },
   });
-  return games.map((g) => ({ id: g.id, players: g.players }));
+  return games.map((g) => ({ id: g.id, createdAt: g.createdAt.getTime(), players: g.players }));
 }
 
 export async function joinGame(gameId: string, userId: string, pseudonym: string) {
@@ -67,4 +68,10 @@ export async function getClientState(gameId: string) {
     select: { id: true, map: true, players: { select: { id: true, pseudonym: true, connected: true } } } as any,
   }) as any;
   return game ? { id: game.id, players: game.players, map: game.map as GameMap } : null;
+}
+
+export async function deleteGame(gameId: string) {
+  // Remove related player sessions first, then the game session
+  await prisma.playerSession.deleteMany({ where: { gameId } });
+  await prisma.gameSession.delete({ where: { id: gameId } });
 }

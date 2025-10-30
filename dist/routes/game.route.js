@@ -113,4 +113,16 @@ router.post("/:gameId/rejoin", async (req, res, next) => {
         next(e);
     }
 });
+router.delete("/:gameId", requireAdmin, async (req, res, next) => {
+    try {
+        const { gameId } = req.params;
+        if (!gameId)
+            return res.status(400).json({ message: "gameId required" });
+        await repo.deleteGame(gameId);
+        return res.status(204).end();
+    }
+    catch (e) {
+        next(e);
+    }
+});
 exports.default = router;

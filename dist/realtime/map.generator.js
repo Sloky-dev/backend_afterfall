@@ -33,7 +33,8 @@ function generateGameMap(players = 5, aiPlayers = 5, width = 1600, height = 900)
         const y = Math.random() * height;
         points.push([x, y]);
     }
-    const voronoi = d3_delaunay_1.Delaunay.from(points).voronoi([0, 0, width, height]);
+    const delaunay = d3_delaunay_1.Delaunay.from(points);
+    const voronoi = delaunay.voronoi([0, 0, width, height]);
     const tiles = [];
     points.forEach((pt, i) => {
         const polygon = voronoi.cellPolygon(i);
@@ -49,7 +50,13 @@ function generateGameMap(players = 5, aiPlayers = 5, width = 1600, height = 900)
             resourceType,
             coords: polygon,
             owner: null,
+            neighbors: [],
         });
+    });
+    // Populate neighbors using Delaunay graph
+    tiles.forEach((_t, i) => {
+        const neigh = Array.from(delaunay.neighbors(i));
+        tiles[i].neighbors = neigh.map((j) => `tile_${j + 1}`);
     });
     return { width, height, seaPolygon, tiles };
 }

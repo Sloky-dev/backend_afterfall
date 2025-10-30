@@ -6,6 +6,7 @@ exports.joinGame = joinGame;
 exports.reconnect = reconnect;
 exports.markDisconnected = markDisconnected;
 exports.getClientState = getClientState;
+exports.deleteGame = deleteGame;
 const prisma_1 = require("../lib/prisma");
 const crypto_1 = require("crypto");
 const map_generator_1 = require("./map.generator");
@@ -23,10 +24,11 @@ async function listGames() {
         orderBy: { createdAt: "desc" },
         select: {
             id: true,
+            createdAt: true,
             players: { select: { id: true, pseudonym: true, connected: true } },
         },
     });
-    return games.map((g) => ({ id: g.id, players: g.players }));
+    return games.map((g) => ({ id: g.id, createdAt: g.createdAt.getTime(), players: g.players }));
 }
 async function joinGame(gameId, userId, pseudonym) {
     // Reuse existing session if any for this game/user
@@ -69,4 +71,9 @@ async function getClientState(gameId) {
         select: { id: true, map: true, players: { select: { id: true, pseudonym: true, connected: true } } },
     });
     return game ? { id: game.id, players: game.players, map: game.map } : null;
+}
+async function deleteGame(gameId) {
+    // Remove related player sessions first, then the game session
+    await prisma_1.prisma.playerSession.deleteMany({ where: { gameId } });
+    await prisma_1.prisma.gameSession.delete({ where: { id: gameId } });
 }

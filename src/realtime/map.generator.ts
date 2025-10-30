@@ -90,8 +90,8 @@ export function generateGameMap(players = 5, aiPlayers = 5, width = 1600, height
 
   // Populate neighbors using Delaunay graph
   tiles.forEach((_t, i) => {
-    const neigh = Array.from(delaunay.neighbors(i));
-    tiles[i].neighbors = neigh.map(j => `tile_${j + 1}`);
+    const neigh = Array.from<number>(delaunay.neighbors(i));
+    tiles[i].neighbors = neigh.map((j: number) => `tile_${j + 1}`);
   });
 
   return { width, height, seaPolygon, tiles };
