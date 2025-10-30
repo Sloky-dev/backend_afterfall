@@ -30,4 +30,29 @@ model User {
   updatedAt DateTime @updatedAt
   locale    String   @default("fr")
   role      Role     @default(PLAYER)
+  gameSessions  GameSession[] @relation("GameSessionCreator")
+  playerSessions PlayerSession[]
+}
+
+model GameSession {
+  id         String   @id @default(uuid()) @db.Uuid
+  createdAt  DateTime @default(now())
+  createdBy  String   @db.Uuid
+  creator    User     @relation("GameSessionCreator", fields: [createdBy], references: [id])
+  players    PlayerSession[]
+}
+
+model PlayerSession {
+  id         String   @id @default(uuid()) @db.Uuid
+  gameId     String   @db.Uuid
+  game       GameSession @relation(fields: [gameId], references: [id])
+  userId     String   @db.Uuid
+  user       User     @relation(fields: [userId], references: [id])
+  pseudonym  String
+  token      String   @unique
+  connected  Boolean  @default(true)
+  lastSeenAt DateTime @default(now())
+
+  @@index([gameId])
+  @@index([userId])
 }
